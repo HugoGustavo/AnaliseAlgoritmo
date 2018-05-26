@@ -1,0 +1,46 @@
+modulo ordenacaoIntercalacao(Vetor: origem, destino; inteiro: limiteInferior, limiteSuperior)
+    se ( limiteSuperior <= limiteInferior + DESLOCAMENTO )
+        entao inicio
+            ordenacaoInsercao(destino, limiteInferior, limiteSuperior);
+            retornar;
+        fim;
+    fimse;
+    inteiro: meio <-- limiteInferior + ( limiteSuperior - limiteInferior)/2;
+    ordenacaoIntercalacao(destino, origem, limiteInferior, meio);
+    ordenacaoIntercalacao(destino, origem, meio+1, limiteSuperior);
+    se ( origem[meio+1] >= origem[meio] )
+        entao
+            copiar(origem, limiteInferior, destino, limiteInferior, limiteSuperior-limiteInferior+1);
+    fimse;
+    intercalar(vetor, limiteInferior, meio, limiteSuperior);
+fimmodulo;
+
+modulo intercalar(Vetor: origem, destino; inteiro: limiteInferior, meio, limiteSuperior)
+    se ( não estaOrdenado(origem, limiteInferior, meio) ou não estaOrdenado(origem, meio+1, limiteSuperior) )
+        entao retornar;
+    fim;
+    inteiro: i <-- limiteInferior, j <-- meio + 1;
+    para k de limiteInferior até limiteSuperior passo 1 faca
+        se( i > meio )
+            entao inicio
+                destino[k] <-- origem[j]; j <-- j + 1;
+            fim;
+            senao se ( j > limiteSuperior )
+                entao inicio
+                    destino[k] <-- origem[i]; i <-- i + 1;
+                fim;
+                senao se ( origem[j] < origem[i] )
+                        entao inicio
+                            destino[k] <-- origem[j]; j <-- j + 1;
+                        fim;
+                        senao inicio
+                            destino[k] <-- origem[i]; i <-- i + 1;
+                        fim;
+                fimse;
+            fimse;
+        fimse;
+    fimpara;
+    se ( nao estaOrdenado(destino, limiteInferior, limiteSuperior) )
+        entao retorna;
+    fimse;
+fimmodulo;  
