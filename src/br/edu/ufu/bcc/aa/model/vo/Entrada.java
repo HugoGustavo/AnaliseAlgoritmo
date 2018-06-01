@@ -47,6 +47,14 @@ public class Entrada implements Cloneable {
 		this.instancias.set(index, instancia);
 	}
 	
+	public void add(int index, Instancia instancia) {
+		this.instancias.add(index, instancia);
+	}
+	
+	public Instancia remove(int index) {
+		return this.remove(index);
+	}
+	
 	public void add(Instancia instancia) {
 		this.instancias.add(instancia);
 	}

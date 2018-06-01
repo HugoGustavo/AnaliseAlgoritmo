@@ -6,6 +6,7 @@ import br.edu.ufu.bcc.aa.model.vo.Instancia;
 
 public class OrdenacaoIntercalacao extends AlgoritmoOrdenacao {
 	private static final int DESLOCAMENTO = 7;
+	private BuscaBinaria buscaBinaria = new BuscaBinaria();
 
 	private void ordenacaoInsercao(Entrada entrada, int limiteInferior, int limiteSuperior, Comparador comparador) {
 		for (int i = limiteInferior; i <= limiteSuperior; i++)
@@ -17,6 +18,20 @@ public class OrdenacaoIntercalacao extends AlgoritmoOrdenacao {
 		for (int i = 0; i < tamanho; i++) {
 			Instancia instancia = origem.get(posicaoOrigem+i);
 			destino.set(posicaoDestino+i, instancia);
+		}
+	}
+	
+	private void imprimir(Entrada entrada, int limiteInferior, int limiteSuperior) {
+		for (int i = limiteInferior; i <= limiteSuperior; i++)
+			System.out.println(entrada.get(i));
+		System.out.println();
+	}
+	
+	private void esperar() {
+		try {
+			Thread.sleep(5000);
+		} catch (Exception e) {
+			
 		}
 	}
 	
@@ -40,9 +55,37 @@ public class OrdenacaoIntercalacao extends AlgoritmoOrdenacao {
 		assert estaOrdenado(destino, limiteInferior, limiteSuperior, comparador);
 	}
 	
+	
+	private void intercalarAlternativo(Entrada origem, Entrada destino, int limiteInferior, int meio, int limiteSuperior, Comparador comparador) {
+		assert estaOrdenado(origem, limiteInferior, meio, comparador);
+		assert estaOrdenado(origem, meio+1, limiteSuperior, comparador);
+		
+		
+		System.out.println("\nMerge");
+		int quantidadeInserida = 0;
+		Entrada aux = new Entrada();
+		aux.setTipo(origem.getTipo());
+		
+		for (int i = limiteInferior; i <= limiteSuperior; i++) {
+			Instancia instancia = origem.get(i);
+			int posicao = buscaBinaria.executar(aux, 0, quantidadeInserida, instancia, comparador);
+			aux.add(posicao, instancia);
+			imprimir(aux, limiteInferior, limiteInferior+quantidadeInserida);
+			esperar();
+			quantidadeInserida++;
+			
+		}
+		
+		copiar(aux, 0, origem, limiteInferior, quantidadeInserida);
+		assert estaOrdenado(destino, limiteInferior, limiteSuperior, comparador);
+	}
+	
 	private void ordenar(Entrada origem, Entrada destino, int limiteInferior, int limiteSuperior, Comparador comparador) {
 		if ( limiteSuperior <= limiteInferior + DESLOCAMENTO ) {
 			ordenacaoInsercao(destino, limiteInferior, limiteSuperior, comparador);
+			System.out.println("Fim da recursao");
+			imprimir(destino, limiteInferior, limiteSuperior);
+			esperar();
 			return;
 		}
 		
@@ -54,7 +97,8 @@ public class OrdenacaoIntercalacao extends AlgoritmoOrdenacao {
 			copiar(origem, limiteInferior, destino, limiteInferior, limiteSuperior - limiteInferior + 1);
 		}
 		
-		intercalar(origem, destino, limiteInferior, meio, limiteSuperior, comparador);
+		intercalarAlternativo(origem, destino, limiteInferior, meio, limiteSuperior, comparador);
+		
 	}
 	
 	@Override
