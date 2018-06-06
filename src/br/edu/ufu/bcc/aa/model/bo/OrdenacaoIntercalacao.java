@@ -20,7 +20,7 @@ public class OrdenacaoIntercalacao extends AlgoritmoOrdenacao {
 			destino.set(posicaoDestino+i, instancia);
 		}
 	}
-	
+	/*
 	private void imprimir(Entrada entrada, int limiteInferior, int limiteSuperior) {
 		for (int i = limiteInferior; i <= limiteSuperior; i++)
 			System.out.println(entrada.get(i));
@@ -54,59 +54,51 @@ public class OrdenacaoIntercalacao extends AlgoritmoOrdenacao {
 		}
 		assert estaOrdenado(destino, limiteInferior, limiteSuperior, comparador);
 	}
+	*/
 	
-	
-	private void intercalarAlternativo(Entrada origem, Entrada destino, int limiteInferior, int meio, int limiteSuperior, Comparador comparador) {
-		assert estaOrdenado(origem, limiteInferior, meio, comparador);
-		assert estaOrdenado(origem, meio+1, limiteSuperior, comparador);
+	private void intercalar(Entrada entrada, int limiteInferior, int meio, int limiteSuperior, Comparador comparador) {
+		//assert estaOrdenado(entrada, limiteInferior, meio, comparador);
+		//assert estaOrdenado(entrada, meio+1, limiteSuperior, comparador);
 		
-		
-		System.out.println("\nMerge");
-		int quantidadeInserida = 0;
 		Entrada aux = new Entrada();
-		aux.setTipo(origem.getTipo());
+		aux.setTipo(entrada.getTipo());
 		
-		for (int i = limiteInferior; i <= limiteSuperior; i++) {
-			Instancia instancia = origem.get(i);
-			int posicao = buscaBinaria.executar(aux, 0, quantidadeInserida, instancia, comparador);
+		int i = limiteInferior;
+		int j = meio+1;
+		
+		while ( i <= meio || j <= limiteSuperior ) {
+			Instancia instancia;
+			if ( i > meio ) {
+				instancia = entrada.get(j++);
+			} else if ( j > limiteSuperior ) {
+				instancia = entrada.get(i++);
+			} else if ( menor(entrada.get(i), entrada.get(j), comparador) ) {
+				instancia = entrada.get(i++);
+			} else {
+				instancia = entrada.get(j++);
+			}
+			int posicao = buscaBinaria.executar(aux, 0, aux.tamanho()-1, instancia, comparador);
 			aux.add(posicao, instancia);
-			imprimir(aux, limiteInferior, limiteInferior+quantidadeInserida);
-			esperar();
-			quantidadeInserida++;
-			
 		}
-		
-		copiar(aux, 0, origem, limiteInferior, quantidadeInserida);
-		assert estaOrdenado(destino, limiteInferior, limiteSuperior, comparador);
+		copiar(aux, 0, entrada, limiteInferior, aux.tamanho());
+		//assert estaOrdenado(entrada, limiteInferior, limiteSuperior, comparador);
 	}
 	
-	private void ordenar(Entrada origem, Entrada destino, int limiteInferior, int limiteSuperior, Comparador comparador) {
+	private void ordenar(Entrada entrada, int limiteInferior, int limiteSuperior, Comparador comparador) {
 		if ( limiteSuperior <= limiteInferior + DESLOCAMENTO ) {
-			ordenacaoInsercao(destino, limiteInferior, limiteSuperior, comparador);
-			System.out.println("Fim da recursao");
-			imprimir(destino, limiteInferior, limiteSuperior);
-			esperar();
+			ordenacaoInsercao(entrada, limiteInferior, limiteSuperior, comparador);
 			return;
 		}
 		
 		int meio = limiteInferior + ( limiteSuperior - limiteInferior) / 2;
-		ordenar(destino, origem, limiteInferior, meio, comparador);
-		ordenar(destino, origem, meio+1, limiteSuperior, comparador);
-	
-		if ( !menor(origem.get(meio+1), origem.get(meio), comparador) ) {
-			copiar(origem, limiteInferior, destino, limiteInferior, limiteSuperior - limiteInferior + 1);
-		}
-		
-		intercalarAlternativo(origem, destino, limiteInferior, meio, limiteSuperior, comparador);
-		
+		ordenar(entrada, limiteInferior, meio, comparador);
+		ordenar(entrada, meio+1, limiteSuperior, comparador);
+		intercalar(entrada, limiteInferior, meio, limiteSuperior, comparador);
 	}
 	
 	@Override
 	public void ordenar(Entrada entrada, Comparador comparador) {
-		Entrada origem = entrada.clone();
-		ordenar(origem, entrada, 0, entrada.tamanho()-1, comparador);
-		assert estaOrdenado(entrada, comparador);
-
+		ordenar(entrada, 0, entrada.tamanho()-1, comparador);
 	}
 
 }
